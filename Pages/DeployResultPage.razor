@@ -1,0 +1,117 @@
+﻿@inject NotificationService NotificationService
+@*<h3>DeployResultPage</h3>*@
+<RadzenNotification></RadzenNotification>
+
+@if (deployDetail == null)
+{
+    <p>Select a detail</p>
+}
+else
+{
+
+    <h2 class="rz-color-secondary">@dockerName</h2>
+
+    <RadzenRadioButtonList @bind-Value=@deployDetail.Result TValue="bool?" Change=@((args) => OnChange(args, "RadioButtonList"))>
+        <Items>
+            <RadzenRadioButtonListItem class="rz-color-warning" Text="Unknow" Value="null" TValue="bool?" />
+            <RadzenRadioButtonListItem class="rz-color-success" Text="Success" Value="true" TValue="bool?" />
+            <RadzenRadioButtonListItem class="rz-color-danger" Text="Failed" Value="false" TValue="bool?" />
+        </Items>
+    </RadzenRadioButtonList>
+    <br />
+    <div class="d-flex  ">
+        <div class="col-md-4">
+            <RadzenText TextStyle="TextStyle.Body2">Deploy Start: @deployDetail.DeployStart</RadzenText>
+        </div>
+        <div class="col-md-4">
+            <RadzenText TextStyle="TextStyle.Body2">Deploy End: @deployDetail.DeployEnd</RadzenText>
+        </div>
+        <div class="col-md-4">
+            <RadzenText TextStyle="TextStyle.Body2">Deploy Duration: @deployDetail.Duration</RadzenText>
+        </div>
+    </div>
+
+    <RadzenCard>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Console Log</RadzenText>
+        <RadzenTextArea @bind-Value=deployDetail.LogText Rows="23" Disabled=true Class="w-100" />
+    </RadzenCard>
+}
+
+
+
+
+
+
+@code {
+    [Inject]
+    public IApiService _controller { get; set; }
+    [Parameter] public int DeployDetailId { get; set; }
+    [Parameter] public string DockerName { get; set; }
+    [Parameter] public EventCallback OnClickDetail { get; set; }
+
+    DeployResult deployDetail;
+    string logFromFile = "";
+    string dockerName = "";
+
+    protected async override Task OnParametersSetAsync()
+    {
+        deployDetail = await _controller.GetDeployDetail(this.DeployDetailId);
+        dockerName = DockerName;
+    }
+
+    private async Task OnChange(bool? value, string name)
+    {
+        string result;
+
+        if (value==null)
+        {
+            //0 = null
+            result = "0";
+        }
+        else
+        {
+            if (value == true)
+            {
+                //1 = true
+                result = "1";
+            }
+            else
+            {
+                //2 = false
+                result = "2";
+            }
+        }
+
+
+        var updatedStatus = await _controller.UpdateDeployDetail(deployDetail.Id, result);
+
+        if (updatedStatus != null)
+        {
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Configuration Updated",
+                    Detail = $"Result Updated succesfully",
+                    Duration = 4000
+
+                });
+        }
+        else
+        {
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Configuration NOT updated",
+                    Detail = $"Error in update - please check the log",
+                    Duration = 4000
+
+                });
+        }
+
+
+
+        await OnClickDetail.InvokeAsync(deployDetail.Id);
+
+
+    }
+}

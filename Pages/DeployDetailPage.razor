@@ -1,0 +1,236 @@
+﻿@inject NotificationService NotificationService
+
+
+<h2 class="rz-color-secondary">@Name (Id: @Id)</h2>
+
+<RadzenTabs TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Client">
+    <Tabs>
+        <RadzenTabsItem Text="Run Deploy">
+            <div class="d-flex ">
+                <div class="col-md-6 justify-content-end">
+                    <RadzenButton Click=@(args => RunDeploy()) Icon="rocket_launch" ButtonStyle="ButtonStyle.Success" Text="Start Deploy" BusyText="Running ..." IsBusy=@busy />
+
+                </div>
+                <div class="col-md-6">
+                    @if (_timer)
+                    {
+                        <h4>timer</h4>
+                    }
+
+                </div>
+
+            </div>
+
+            <hr />
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Console</RadzenText>
+                <RadzenTextArea @bind-Value=ConsoleText Rows="10" Disabled=true Class="w-100" />
+            </RadzenCard>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Send Command">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Console</RadzenText>
+                <RadzenRow>
+                    <RadzenColumn Size="12" SizeMD="10">
+                        <RadzenTextArea @bind-Value=ConsoleResultText Rows="20" Disabled=true Class="w-100" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="2" Gap="1rem">
+                        <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" Gap="1rem" Wrap="FlexWrap.Wrap">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Docker Commands</RadzenText>
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Click=@(args => command="/share/CACHEDEV2_DATA/.qpkg/container-station/bin/docker images") Icon="keyboard_command_key" Text="Images"></RadzenButton>
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Click=@(args => command="/share/CACHEDEV2_DATA/.qpkg/container-station/bin/docker container ls ") Icon="keyboard_command_key" Text="Container"></RadzenButton>
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Click=@(args => command="/share/CACHEDEV2_DATA/.qpkg/container-station/bin/docker images") Icon="keyboard_command_key" Text="Other"></RadzenButton>
+                        </RadzenStack>
+
+                    </RadzenColumn>
+                </RadzenRow>
+
+
+
+                @*                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start"  Gap="0.5rem"> *@
+                <RadzenRow Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start">
+                    @*                     <RadzenColumn Size="12" SizeMD="2">
+                        <div>
+                            <RadzenToggleButton ButtonStyle="ButtonStyle.Danger" ToggleButtonStyle="ButtonStyle.Success" ToggleShade="Shade.Default" 
+                            Click=@(args => OnClick(!dockerCommand))
+                            Text="Docker Command" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Button" }})" />
+                        </div>
+                    </RadzenColumn> *@
+                    <RadzenColumn Size="12" SizeMD="9">
+                        <RadzenTextBox @bind-Value=command Placeholder="> " Style="width: 100%"></RadzenTextBox>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="3">
+                        <RadzenButton ButtonStyle="ButtonStyle.Info" Click="SendCommand" Icon="send" Text="Send"></RadzenButton>
+                    </RadzenColumn>
+                </RadzenRow>
+
+                @* </RadzenStack> *@
+            </RadzenCard>
+
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
+
+
+@code {
+    [Inject]
+    public IApiService _service { get; set; }
+    [Parameter] public int Id { get; set; }
+    [Parameter] public string Name { get; set; }
+    [Parameter] public EventCallback<int> OnClickCallback { get; set; }
+    [Parameter] public EventCallback<int> RefreshDeployDetailsList { get; set; }
+    [Parameter] public EventCallback<int> IdChanged { get; set; }
+    [Parameter] public int DeployDetailId { get; set; }
+
+    private string ConsoleText;
+    private string ConsoleResultText;
+    private string command;
+    // bool dockerCommand = false;
+    bool busy;
+    bool _timer = false;
+    DeployResult deployDetail;
+
+    private HubConnection? _hubConnection;
+
+    protected async override Task OnParametersSetAsync()
+    {
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var url = _service.GetRestUrl();
+
+            _hubConnection = new HubConnectionBuilder()
+            .WithUrl(_service.GetRestUrl() + "notifications")
+            .WithAutomaticReconnect()
+            .ConfigureLogging(logging =>
+                {
+                    logging.SetMinimumLevel(LogLevel.Debug);
+                })
+            .Build();
+
+
+            _hubConnection.On<string, JobResult>("jobNotifications", (resultText, _jobResult) =>
+               {
+                   switch (_jobResult)
+                   {
+                       case JobResult.Failed:
+                           Console.WriteLine($"SignalR Message received ==> {resultText}");
+                           WriteConsole($"{resultText}");
+                           _timer = false;
+                           busy = false;
+                           InvokeAsync(() => StateHasChanged());
+                           break;
+
+                       case JobResult.InProgress:
+                           {
+                               Console.WriteLine($"SignalR Message received ==> {resultText}");
+                               WriteConsole($"{resultText}");
+
+                               break;
+                           }
+
+                       case JobResult.Completed:
+                           {
+                               Console.WriteLine($"SignalR Message received ==> {resultText}");
+                               WriteConsole($"{resultText}");
+                               _timer = false;
+                               busy = false;
+                               InvokeAsync(() => StateHasChanged());
+                               OnClickCallback.InvokeAsync(Id);
+                               break;
+                           }
+                       case JobResult.IdNotPresent:
+                           {
+                               Console.WriteLine($"SignalR Message received ==> {resultText}");
+                               WriteConsole($"{resultText}");
+                               _timer = false;
+                               busy = false;
+                               InvokeAsync(() => StateHasChanged());
+                               break;
+                           }
+
+                       default:
+                           break;
+                   }
+
+               });
+
+            if (_hubConnection.State == HubConnectionState.Disconnected)
+            {
+                await _hubConnection.StartAsync();
+                Console.WriteLine($"SignalR connection started: id {_hubConnection.ConnectionId}");
+                WriteConsole($"SignalR - Connection established. Connection ID: {_hubConnection.ConnectionId}");
+            }
+            else
+            {
+                WriteConsole($"SignalR - Already Connected. Connection ID: {_hubConnection.ConnectionId}");
+                Console.WriteLine($"SignalR - Already Connected. Connection ID: {_hubConnection.ConnectionId}");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"SignlaR Error connection: {ex.Message}");
+            WriteConsole($"SignlaR Error connection: {ex.Message}");
+        }
+
+        await InvokeAsync(() => StateHasChanged());
+
+    }
+
+    private void WriteConsole(string text)
+    {
+        ConsoleText += $"{DateTime.Now} - {text} {Environment.NewLine}";
+        InvokeAsync(() => StateHasChanged());
+    }
+
+    private async Task RunDeploy()
+    {
+        busy = true;
+        _timer = true;
+        ConsoleText = "Starting deploy..." + Environment.NewLine;
+        string _jobId;
+        string _deployStatus;
+
+        ConsoleText += $"Deploy started at {DateTime.Now}" + Environment.NewLine;
+
+        _jobId = await _service.RunDeploy(Id);
+
+        ConsoleText += $"{DateTime.Now} - Job {_jobId}: Started" + Environment.NewLine;
+
+        await RefreshDeployDetailsList.InvokeAsync(Id);
+
+        await InvokeAsync(() => StateHasChanged());
+    }
+
+    private async Task SendCommand()
+    {
+        ConsoleResultText += $"> {command} {Environment.NewLine}";
+
+        var result = await _service.SendCommand(Id, command);
+        // var result = $"{command} send : response";
+
+        ConsoleResultText += result + Environment.NewLine;
+
+        command = string.Empty;
+
+
+    }
+
+    // private void OnClick(bool _dockerCommand)    {
+
+    //     dockerCommand = _dockerCommand;
+    //     ConsoleResultText += $"Docker Command = {dockerCommand} {Environment.NewLine}";
+    //     if (dockerCommand)
+    //     {
+    //         command = "...Docker>";
+    //     }
+    //     else
+    //     {
+    //         command = "";
+    //     }
+    // }
+}

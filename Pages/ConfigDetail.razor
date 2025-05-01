@@ -1,0 +1,580 @@
+﻿@using Deployer_Web.Data.DTO.DockerDeployer
+@inject NotificationService NotificationService
+@inject TooltipService tooltipService
+@inject DialogService DialogService
+
+<RadzenNotification></RadzenNotification>
+<RadzenDialog></RadzenDialog>
+<RadzenTooltip></RadzenTooltip>
+@if (dockerConfig != null)
+{
+    <h2 class="rz-color-secondary">@dockerConfig.Name (Id: @dockerConfig.Id)</h2>
+    <RadzenTemplateForm Data="@dockerConfig" Submit="@((DockerConfigsDto args) => { Submit(args); })">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <RadzenFieldset Text="Docker Info">
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Docker Name" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="DockerName" @bind-Value=dockerConfig.Name Disabled=isupdate />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Description" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="Description" @bind-Value=dockerConfig.Description Disabled=isupdate />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Docker File Name" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="DockerFileName" @bind-Value=dockerConfig.DockerFileName Disabled=isupdate />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Icon" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="Icon" @bind-Value=dockerConfig.RestoreProject Disabled=isupdate />
+                            </div>
+                        </div>
+                    </RadzenFieldset>
+
+                    <RadzenFieldset Text="App Info">
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="App Name" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="AppName" @bind-Value=dockerConfig.AppName Disabled=isupdate />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Solution Repo" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="SolutionRepository" @bind-Value=dockerConfig.SolutionRepository Disabled=isupdate MouseEnter="@(args => ShowTooltipSolutionRepo(args) )" />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Repo Branch" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="RepositoryBranch" @bind-Value=dockerConfig.Branch Disabled=isupdate MouseEnter="@(args => ShowTooltipRepoBranch(args) )" />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Restore Build Prj" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="RestoreBuildProject" @bind-Value=dockerConfig.BuildProject Disabled=isupdate MouseEnter="@(args => ShowTooltipRestoreBuildPrj(args) )" />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+
+                            <div class="col-md-4 align-items-left d-flex">
+                                <RadzenRadioButtonList @bind-Value=@_appEntryName Change=@AppNameChange TValue="int" Disabled=isupdate>
+                                    <Items>
+                                        <RadzenRadioButtonListItem Text="App Name" Value="1" />
+                                        <RadzenRadioButtonListItem Text="Wasm Prj" Value="2" />
+                                    </Items>
+                                </RadzenRadioButtonList>
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="AppEntry" @bind-Value=dockerConfig.AppEntryName Disabled=isupdate />
+                            </div>
+
+                        </div>
+
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="SDK Version" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="SDKVersion" @bind-Value=dockerConfig.SkdVersion Disabled=isupdate MouseEnter="@(args => ShowTooltipSDKVersion(args) )" />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Solution Folder" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="SolutionFolder" @bind-Value=dockerConfig.SolutionFolder Disabled=isupdate />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Image Version" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="ImageVersion" @bind-Value=dockerConfig.ImageVersion Disabled=isupdate />
+                            </div>
+                        </div>
+                    </RadzenFieldset>
+
+                </div>
+                <div class="col-md-6">
+
+
+                    <RadzenFieldset Text="NAS Info">
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="NAS Address" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="NasAddress" @bind-Value=dockerConfig.Host Disabled=isupdate />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="NAS User" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="NasUser" @bind-Value=dockerConfig.User Disabled=isupdate />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="NAS Password" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenPassword style="width: 100%;" Name="NasPsw" @bind-Value=dockerConfig.Password Disabled=isupdate />
+                            </div>
+                        </div>
+
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Command" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="DockerCommand" @bind-Value=dockerConfig.DockerCommand Disabled=isupdate />
+                            </div>
+                        </div>
+
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="NAS Path" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="NasPath" @bind-Value=dockerConfig.NasLocalFolderPath Disabled=isupdate />
+                            </div>
+                        </div>
+                    </RadzenFieldset>
+
+                    <RadzenFieldset Text="Container Info">
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Port Map" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="PortMap" @bind-Value=dockerConfig.PortAddress Disabled=isupdate />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Folder Nas1" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="FolderNas1" @bind-Value=dockerConfig.FolderFrom1 Disabled=isupdate />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Folder Contain 1" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="FolderContainer1" @bind-Value=dockerConfig.FolderContainer1 Disabled=isupdate />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Folder Nas2" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="FolderNas2" @bind-Value=dockerConfig.FolderFrom2 Disabled=isupdate />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Folder Contain 2" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="FolderContainer2" @bind-Value=dockerConfig.FolderContainer2 Disabled=isupdate />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Folder Nas3" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="FolderNas3" @bind-Value=dockerConfig.FolderFrom3 Disabled=isupdate />
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Folder Contain 3" />
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenTextBox style="width: 100%;" Name="FolderContainer3" @bind-Value=dockerConfig.FolderContainer3 Disabled=@isupdate />
+                            </div>
+                        </div>
+                    </RadzenFieldset>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-10 d-flex align-items-end justify-content-center" style="margin-top: 16px;">
+                    @if (isupdate)
+                    {
+                        <RadzenRow AlignItems=AlignItems.Center JustifyContent=JustifyContent.SpaceBetween>
+                            <RadzenButton Click="@Delete" Icon="delete" Text="Delete" ButtonStyle="ButtonStyle.Danger" />
+                            <RadzenButton Click="@Clone" Icon="content_copy" Text="Clone" ButtonStyle="ButtonStyle.Success" />
+                            <RadzenButton Click="@Update" Icon="edit" Text="Update" ButtonStyle="ButtonStyle.Warning" />
+                        </RadzenRow>
+
+                    }
+                    else
+                    {
+                        <RadzenRow AlignItems=AlignItems.Center JustifyContent=JustifyContent.SpaceBetween>
+                            <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="cancel" style="display: inline-block; margin-left: 10px;"
+                                          Text="Cancel" Click="@Cancel" />
+                            <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Save" />
+
+                        </RadzenRow>
+
+                    }
+
+                </div>
+                <div class="col-md-2 d-flex align-items-end justify-content-right" style="margin-top: 16px;">
+                    @if (isupdate)
+                    {
+                        <RadzenButton Icon="rocket_launch" Text="Run" ButtonStyle="ButtonStyle.Secondary" Style="text-align:right" Click="@Run" />
+
+                        <RadzenButton Icon="content_paste_search" ButtonStyle="ButtonStyle.Light" Click="@ViewDockerFile" MouseEnter="@(args => ShowTooltipViewDockerFile(args) )" />
+
+                    }
+                </div>
+            </div>
+        </div>
+    </RadzenTemplateForm>
+
+
+
+}
+else
+{
+    <p>"please select a configuration"</p>
+}
+
+@code {
+    [Inject]
+    public IApiService _controller { get; set; }
+
+    [Parameter] public int? Id { get; set; }
+    [Parameter] public bool duplicate { get; set; }
+    [Parameter] public EventCallback OnClickCallback { get; set; }
+    [Parameter] public EventCallback OnClickRun { get; set; }
+    [Parameter] public EventCallback<int> IdChanged { get; set; }
+
+    private DockerConfigsDto? dockerConfig;
+    private bool isupdate = true;
+    private int _appEntryName = 1;
+
+    protected async override Task OnParametersSetAsync()
+    {
+        isupdate = true;
+
+        dockerConfig = await _controller.GetDockerConfig(this.Id ?? 0);
+
+        if (dockerConfig != null)
+        {
+            if (dockerConfig.AppEntryName == "WASM")
+            {
+                _appEntryName = 2;
+            }
+            else
+            {
+                _appEntryName = 1;
+            }
+        }
+
+        if (duplicate)
+        {
+            //dockerConfig.Id = 0;
+            dockerConfig.Name = string.Empty;
+            isupdate = false;
+        }
+
+
+    }
+
+    void OnChange(object value, string name)
+    {
+        var str = value is IEnumerable<object> ? string.Join(", ", (IEnumerable<object>)value) : value;
+
+        //Console.Log($"{name} value changed to {str}");
+    }
+
+
+    async Task Submit(DockerConfigsDto arg)
+    {
+        if (duplicate)
+        {
+            //add
+            if (_appEntryName == 2)
+            {
+                arg.AppEntryName = "WASM";
+
+            }
+            dockerConfig = await _controller.AddConfig(arg);
+
+            if (dockerConfig == null)
+            {
+                NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Configuration NOT cloned",
+                        Detail = $"Error in update config: check the log",
+                        Duration = 4000
+
+                    });
+            }
+            else
+            {
+                NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Configuration Cloned",
+                        Detail = $"New Configuration {dockerConfig.Name} added",
+                        Duration = 4000
+
+                    });
+                isupdate = true;
+
+
+                await OnClickCallback.InvokeAsync();
+                await IdChanged.InvokeAsync(dockerConfig.Id);
+                duplicate = false;
+                StateHasChanged();
+            }
+
+        }
+        else
+        {
+            //update config
+            if (_appEntryName == 2)
+            {
+                arg.AppEntryName = "WASM";
+
+            }
+            dockerConfig = await _controller.UpdateConfig(arg);
+
+            if (dockerConfig == null)
+            {
+                NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Configuration NOT updated",
+                        Detail = $"Error in update config: check the log",
+                        Duration = 4000
+
+                    });
+            }
+            else
+            {
+                NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Configuration Updated",
+                        Detail = $"Configuration {dockerConfig.Name} updated",
+                        Duration = 4000
+
+                    });
+            }
+
+            isupdate = true;
+
+
+            //await OnClickCallback.InvokeAsync();
+            await IdChanged.InvokeAsync(dockerConfig.Id);
+        }
+
+    }
+
+    void AppNameChange()
+    {
+        if (_appEntryName == 2)
+        {
+            dockerConfig.AppEntryName = "WASM";
+            StateHasChanged();
+        }
+
+    }
+
+    void Clone()
+    {
+        var newdockerConfig = new DockerConfigsDto()
+            {
+                AppEntryName = dockerConfig.AppEntryName,
+                Branch = dockerConfig.Branch,
+                AppName = dockerConfig.AppName,
+                DockerCommand = dockerConfig.DockerCommand,
+                BuildProject = dockerConfig.BuildProject,
+                DockerFileName = dockerConfig.DockerFileName,
+                Description = dockerConfig.Description,
+                Host = dockerConfig.Host,
+                FolderContainer1 = dockerConfig.FolderContainer1,
+                FolderContainer2 = dockerConfig.FolderContainer2,
+                FolderContainer3 = dockerConfig.FolderContainer3,
+                FolderFrom1 = dockerConfig.FolderFrom1,
+                FolderFrom2 = dockerConfig.FolderFrom2,
+                FolderFrom3 = dockerConfig.FolderFrom3,
+                ImageVersion = dockerConfig.ImageVersion,
+                NasLocalFolderPath = dockerConfig.NasLocalFolderPath,
+                Note = dockerConfig.Note,
+                Password = dockerConfig.Password,
+                PortAddress = dockerConfig.PortAddress,
+                RestoreProject = dockerConfig.RestoreProject,
+                SkdVersion = dockerConfig.SkdVersion,
+                SolutionFolder = dockerConfig.SolutionFolder,
+                SolutionRepository = dockerConfig.SolutionRepository,
+                User = dockerConfig.User,
+                Name = string.Empty
+            };
+
+        dockerConfig = newdockerConfig;
+        StateHasChanged();
+        isupdate = !isupdate;
+        duplicate = true;
+    }
+
+    private async Task Delete()
+    {
+
+        if (dockerConfig != null)
+        {
+            var confirmDelete = await DialogService.Confirm($"Are you sure to delete {dockerConfig.Name}?", "Delete Config", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+            if (confirmDelete == true)
+            {
+                var deleteResult = await _controller.DeleteConfig(dockerConfig.Id);
+
+                if (!deleteResult)
+                {
+                    NotificationService.Notify(new NotificationMessage
+                        {
+                            Severity = NotificationSeverity.Error,
+                            Summary = "Configuration NOT deleted",
+                            Detail = $"Error in update config: check the log",
+                            Duration = 4000
+
+                        });
+
+                }
+                else
+                {
+                    NotificationService.Notify(new NotificationMessage
+                        {
+                            Severity = NotificationSeverity.Success,
+                            Summary = "Configuration Deleted",
+                            Detail = $"Configuration {dockerConfig.Name} deleted",
+                            Duration = 4000
+
+                        });
+
+                    this.Id = null;
+                    dockerConfig = null;
+                    await IdChanged.InvokeAsync(0);
+                    StateHasChanged();
+                    await OnClickCallback.InvokeAsync();
+                }
+
+            }
+        }
+
+
+    }
+
+    async Task Cancel()
+    {
+
+        //todo force search id
+        //todo message DONE
+        if (duplicate)
+        {
+            dockerConfig = null;
+        }
+        else
+        {
+            isupdate = true;
+        }
+
+
+    }
+
+    async Task Run()
+    {
+        await OnClickRun.InvokeAsync();
+    }
+
+    void Update()
+    {
+        isupdate = !isupdate;
+    }
+
+    private async Task ViewDockerFile()
+    {
+        var _dockerFile = await _controller.GetDockerFile(dockerConfig);
+
+        //todo add RadzenTextArea in dialog
+        await DialogService.Alert($"{_dockerFile}", "DockerFile", new AlertOptions() { OkButtonText = "OK" });
+
+    }
+
+    #region Tooltips
+
+    void ShowTooltipViewDockerFile(ElementReference elementReference, TooltipOptions options = null) => tooltipService.Open(elementReference, "DockerFile preview", options);
+
+    void ShowTooltipSolutionRepo(ElementReference elementReference, TooltipOptions options = null) => tooltipService.Open(elementReference, "-b [branch] + master", options);
+    void ShowTooltipSDKVersion(ElementReference elementReference, TooltipOptions options = null) => tooltipService.Open(elementReference, "i.e. 7.0-bullseye-slim-arm32v7", options);
+
+    //-b dotNet7
+    void ShowTooltipRepoBranch(ElementReference elementReference, TooltipOptions options = null) => tooltipService.Open(elementReference, "i.e. dotNet7", options);
+
+    //./solutionFolder/add.csprj
+    void ShowTooltipRestoreBuildPrj(ElementReference elementReference, TooltipOptions options = null) => tooltipService.Open(elementReference, "i.e. dotNet7.csproj", options);
+
+
+    #endregion
+}

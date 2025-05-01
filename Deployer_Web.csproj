@@ -13,4 +13,8 @@
         <PackageReference Include="Radzen.Blazor" Version="6.6.4" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\sample-data\weather.json" />
+    </ItemGroup>
+
 </Project>

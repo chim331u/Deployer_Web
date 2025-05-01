@@ -1,0 +1,340 @@
+﻿@page "/"
+@using Deployer_Web.Data.DTO.DockerDeployer
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+
+
+<RadzenLayout class="rz-shadow-3" Style="grid-template-columns: auto 1fr auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-right-sidebar'">
+
+    <RadzenSidebar>
+        <div class="p-2">
+            <RadzenRow>
+                <RadzenColumn Size="9">
+                    <h4>Docker Configurations</h4>
+                </RadzenColumn>
+                <RadzenColumn>
+                    @if (dockerConfigs != null)
+                    {
+                        <RadzenButton Icon="sort_by_alpha" Click=@sortDockerConfig ButtonStyle="ButtonStyle.Light" />
+                    }
+
+                </RadzenColumn>
+            </RadzenRow>
+
+            <hr />
+            @if (loading)
+            {
+                <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Success" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+            }
+            @if (dockerConfigs == null)
+            {
+                <p>No Configurations to load</p>
+            }
+            else
+            {
+                @foreach (var item in dockerConfigs)
+                {
+                    <RadzenRow>
+                        <RadzenButton Click=@(args => DockerConfigDetail(item.Id, item.Name))
+                        Text=@item.Name
+                        ButtonStyle="ButtonStyle.Secondary" 
+                        Variant="Variant.Text"
+                        Icon="@item.DockerIcon">
+
+                        </RadzenButton>
+                    </RadzenRow>
+                }
+            }
+        </div>
+
+    </RadzenSidebar>
+
+    <RadzenBody>
+
+        @switch (page)
+        {
+
+            case "1":
+
+                <ConfigDetail @bind-Id=selectedConfigId duplicate=@duplicate 
+                OnClickCallback="@RefreshList" OnClickRun="@RunDeploy" />
+                break;
+
+            case "2":
+                <DeployDetailPage Id="@selectedConfigId" DeployDetailId="@selectedDeployDetail" Name="@dockerName" 
+                RefreshDeployDetailsList="@RefreshLastDeployDetails" OnClickCallback="@LoadLastDeploy"></DeployDetailPage>
+                break;
+
+            case "3":
+                <DeployResultPage DeployDetailId="@selectedDeployDetail" DockerName="@selectedDockerName" 
+                OnClickDetail="@ShowDeployDetail"></DeployResultPage>
+                break;
+
+        }
+
+    </RadzenBody>
+
+    <RadzenSidebar Style="width: 220px; grid-area: rz-right-sidebar">
+        <div class="p-2">
+            <RadzenRow>
+                <RadzenColumn Size="8">
+                    <h4>Deploy Detail list</h4>
+                </RadzenColumn>
+                <RadzenColumn>
+                    @if (deplyDetails != null)
+                    {
+                        @if (deplyDetails.Count() > 0)
+                        {
+                            @if (sortDeployListAsc)
+                            {
+                                <RadzenButton Icon="format_list_numbered" Click=@sortDeployList ButtonStyle="ButtonStyle.Light" />
+                            }
+                            else
+                            {
+                                <RadzenButton Icon="format_list_numbered_rtl" Click=@sortDeployList ButtonStyle="ButtonStyle.Light" />
+                            }
+                        }
+                    }
+                </RadzenColumn>
+            </RadzenRow>
+
+            <hr />
+            @if (deplyDetails == null || deplyDetails.Count() == 0)
+            {
+                <p>Configuration not yet deployed</p>
+            }
+            else
+            {
+                @foreach (var item in deplyDetails)
+                {
+                    var name = item.DeployStart.ToString("yyyy-MM-dd HH:mm:ss");
+
+                    switch (item.Result)
+                    {
+                        case null:
+
+                            <RadzenButton Icon="help_outline" Variant="Variant.Text" Click=@(args => OnLogItemClick(item.Id)) Text=@name ButtonStyle="ButtonStyle.Warning" />
+                            break;
+
+                        case true:
+
+                            <RadzenButton Icon="check_circle" Variant="Variant.Text" Click=@(args => OnLogItemClick(item.Id))
+                            Text=@name ButtonStyle="ButtonStyle.Success" />
+
+                            break;
+
+                        case false:
+
+                            <RadzenButton Icon="cancel" Variant="Variant.Text" Click=@(args => OnLogItemClick(item.Id))
+                            Text=@name ButtonStyle="ButtonStyle.Danger" />
+
+                            break;
+
+                    }
+                }
+            }
+
+        </div>
+    </RadzenSidebar>
+
+</RadzenLayout>
+
+
+
+@code {
+
+    [Inject]
+    public IApiService _service { get; set; }
+
+    string page = "1";
+
+    IEnumerable<DockerConfigListDto>? dockerConfigs;
+    IEnumerable<DeployDetailDto>? deplyDetails;
+
+    //DockerDetail? selectedConfig;
+    int selectedDeployDetail = 0;
+
+    int selectedConfigId = 0;
+    string dockerName = null;
+    bool duplicate = false;
+    bool loading;
+    string selectedDockerConf = string.Empty;
+    string selectedDockerName = string.Empty;
+    bool sortDeployListAsc = false;
+    bool sortDockerConfigAsc = false;
+
+    protected async override Task OnParametersSetAsync()
+    {
+        loading = true;
+        dockerConfigs = await _service.GetActiveDockerConfigList();
+        sortDockerConfig();
+        loading = false;
+    }
+
+    async void DockerConfigDetail(int id, string _dockerName)
+    {
+        selectedConfigId = id;
+        selectedDockerName = _dockerName;
+        page = "1";
+        await RefreshLastDeployDetails(id);
+
+
+    }
+    private void sortDockerConfig()
+    {
+
+        if (dockerConfigs != null)
+        {
+            if (sortDockerConfigAsc)
+            {
+                dockerConfigs = dockerConfigs.OrderByDescending(x => x.Name);
+            }
+            else
+            {
+                dockerConfigs = dockerConfigs.OrderBy(x => x.Name);
+            }
+
+            sortDockerConfigAsc = !sortDockerConfigAsc;
+        }
+
+    }
+    private void sortDeployList()
+    {
+        if (deplyDetails != null)
+        {
+            if (sortDeployListAsc)
+            {
+                deplyDetails = deplyDetails.OrderByDescending(x => x.DeployStart);
+            }
+            else
+            {
+                deplyDetails = deplyDetails.OrderBy(x => x.DeployStart);
+            }
+
+            sortDeployListAsc = !sortDeployListAsc;
+        }
+
+
+    }
+
+    async void OnClick(RadzenSplitButtonItem item, int id, string _dockerName)
+    {
+        selectedDockerName = _dockerName;
+        page = "1";
+
+        if (item != null)
+        {
+            if (item.Value == "2")
+            {
+                //delete
+
+                //var confirmationResult = await this.DialogService.Confirm("Are you sure?", "Dialog Title", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+                //if (confirmationResult == true)
+                //{
+                //    //Delete logic for id
+                //    var deletedConfig = await _controller.DeleteConfig(selectedConfigId);
+
+                //    if (deletedConfig == null)
+                //    {
+                //        NotificationService.Notify(new NotificationMessage
+                //            {
+                //                Severity = NotificationSeverity.Error,
+                //                Summary = "Configuration Delete",
+                //                Detail = $"Error in delete config: check the log",
+                //                Duration = 4000
+
+                //            });
+                //    }
+                //    else
+                //    {
+                //        NotificationService.Notify(new NotificationMessage
+                //            {
+                //                Severity = NotificationSeverity.Success,
+                //                Summary = "Configuration Delete",
+                //                Detail = $"Configuration {deletedConfig.Name} deleted",
+                //                Duration = 4000
+
+                //            });
+                //    }
+                //    await RefreshList();
+                //}
+
+
+
+            }
+            else
+            {
+                //duplicate
+
+                selectedConfigId = id;
+                duplicate = true;
+                await RefreshLastDeployDetails(id);
+            }
+
+
+        }
+        else
+        {
+            //detail
+            selectedConfigId = id;
+            dockerName = _dockerName;
+            duplicate = false;
+            await RefreshLastDeployDetails(id);
+        }
+    }
+
+
+    private async Task RefreshList()
+    {
+        var test = selectedConfigId;
+
+        dockerConfigs = await _service.GetActiveDockerConfigList();
+        sortDockerConfig();
+        duplicate = false;
+
+        StateHasChanged();
+    }
+
+    private async Task RunDeploy()
+    {
+        dockerName = dockerConfigs.Where(x => x.Id == selectedConfigId).Select(x => x.Name).FirstOrDefault();
+
+        page = "2";
+    }
+
+    private async Task ShowDeployDetail()
+    {
+        await RefreshLastDeployDetails(selectedConfigId);
+
+    }
+
+
+    private async Task LoadLastDeploy(int id)
+    {
+        // var test = selectedDeployDetail;
+        await RefreshLastDeployDetails(id);
+
+        //selectedDeployDetail = id;
+
+        selectedDeployDetail = deplyDetails.Select(x=>x.Id).FirstOrDefault();
+        page = "3";
+    }
+
+    private async Task RefreshLastDeployDetails(int id)
+    {
+        deplyDetails = await _service.GetDeployDetailList(id.ToString());
+
+        StateHasChanged();
+    }
+
+
+
+    async void OnLogItemClick(int deployDetailid)
+    {
+        page = "3";
+        selectedDeployDetail = deployDetailid;
+
+
+
+    }
+}
