@@ -173,7 +173,7 @@ namespace Deployer_Web.Service
 
         public async Task<List<DeployDetailDto>> GetDeployDetailList(string dockerConfigId)
         {
-            Uri uri = new Uri(string.Format(GetRestUrl() + $"Api/DockerConfig/GetDeployDetailList/{dockerConfigId}", string.Empty));
+            Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/GetDeployDetailList/{dockerConfigId}", string.Empty));
 
 
             var dataResponse = new List<DeployDetailDto>();
@@ -202,7 +202,7 @@ namespace Deployer_Web.Service
 
         public async Task<DeployResult> GetDeployDetail(int deployDetatilId)
         {
-            Uri uri = new Uri(string.Format(GetRestUrl() + $"Api/DockerConfig/GetDeployDetailResult/{deployDetatilId}", string.Empty));
+            Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/GetDeployDetailResult/{deployDetatilId}", string.Empty));
 
 
             DeployResult dataResponse;
@@ -230,7 +230,7 @@ namespace Deployer_Web.Service
 
         public async Task<string> GetDockerFile(DockerConfigsDto dockerConfig)
         {
-            Uri uri = new Uri(string.Format(GetRestUrl() + $"Api/DockerConfig/GetDockerFile", string.Empty));
+            Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/GetDockerFile", string.Empty));
 
             try
             {
@@ -256,7 +256,7 @@ namespace Deployer_Web.Service
 
         public async Task<string> RunDeploy(int dockerConfigId)
         {
-            Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/DockerDeployer/RunDeploy/{dockerConfigId}", string.Empty));
+            Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/RunDeploy/{dockerConfigId}", string.Empty));
 
             string _dataResponse;
             try
