@@ -283,96 +283,12 @@ namespace Deployer_Web.Service
 
         }
 
-        public async Task<string> GetDeployStatus(string checkingId)
-        {
-            Uri uri = new Uri(string.Format(GetRestUrl() + $"Api/DockerConfig/deploystatuscheck/{checkingId}", string.Empty));
-
-            try
-            {
-                HttpResponseMessage response = await _httpClient.GetAsync(uri);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    string status = await response.Content.ReadAsStringAsync();
-                    var dataResponse = JsonSerializer.Deserialize<DeployStatusCheck>(status, _serializerOptions);
-                    return dataResponse.Status;
-                }
-
-                return "Error";
-
-            }
-            catch (Exception ex)
-            {
-
-                Console.WriteLine(@"\tERROR {0}", ex.Message);
-
-                return ex.Message;
-            }
-        }
+       
         #region Service
 
-        private void WriteJsonConfig()
-        {
-
-
-            //DeployStatusCheck deployStatusCheck = new DeployStatusCheck { Status = "FINISH", EndDeploy = DateTime.Now };
-
-
-            //var json = System.Text.Json.JsonSerializer.Serialize(deployStatusCheck);
-            //File.WriteAllText(deployCheckStatusPath, json);
-
-
-        }
-
-        private ICollection<LocalSettings> GetSettings()
-        {
-            string path = $"settings.json";
-
-            var jsonResult = File.ReadAllText(path);
-
-            var result = JsonSerializer.Deserialize<ICollection<LocalSettings>>(jsonResult);
-
-            return result;
-
-        }
-        //public string SetRestUrl(string address, string port, string schema)
-        //{
-        //    try
-        //    {
-
-        //        //Preferences.Set("address", address);
-        //        //Preferences.Set("port", port);
-        //        //Preferences.Set("schema", schema);
-
-        //        return $"{schema}://{address}:{port}/api/";
-        //    }
-        //    catch (Exception ex)
-        //    {
-
-        //        return ex.Message;
-        //    }
-
-
-        //}
 
         public string GetRestUrl()
         {
-            //SetRestUrl("10.0.2.2", "5107", "http");
-
-            //try
-            //{
-            //    var address = _config.GetSection("Address");
-            //    var port = Preferences.Get("port", "5186");
-            //    var schema = Preferences.Get("schema", "http");
-
-            //    return $"{schema}://{address}:{port}/api/";
-            //}
-            //catch (Exception ex)
-            //{
-
-            //    return ex.Message;
-            //}
-
             var uri = _config.GetSection("Uri").Value;
             return uri;
         }
@@ -434,12 +350,6 @@ namespace Deployer_Web.Service
             return string.Empty;
         }
 
-
-
-        //public string GetConfigValue(string key)
-        //{
-        //    return Preferences.Get(key, string.Empty);
-        //}
         #endregion
     }
 }

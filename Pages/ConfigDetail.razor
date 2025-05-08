@@ -46,45 +46,47 @@
                                 <RadzenLabel Text="Icon" />
                             </div>
                             <div class="col-md-8">
-                                <RadzenTextBox style="width: 100%;" Name="Icon" @bind-Value=dockerConfig.RestoreProject Disabled=isupdate />
+                                <RadzenTextBox style="width: 100%;" Name="Icon" @bind-Value=dockerConfig.Icon Disabled=isupdate />
                             </div>
                         </div>
                     </RadzenFieldset>
 
                     <RadzenFieldset Text="App Info">
+                        @* TODO: ADD DOCKER REGISTRY *@
+                        @* TODO: ADD Compile with nocache *@
                         <div class="row">
                             <div class="col-md-4 align-items-center d-flex">
-                                <RadzenLabel Text="App Name" />
+                                <RadzenLabel Text="App Name"/>
                             </div>
                             <div class="col-md-8">
-                                <RadzenTextBox style="width: 100%;" Name="AppName" @bind-Value=dockerConfig.AppName Disabled=isupdate />
+                                <RadzenTextBox style="width: 100%;" Name="AppName" @bind-Value=dockerConfig.AppName Disabled=isupdate/>
                             </div>
                         </div>
                         <br>
                         <div class="row">
                             <div class="col-md-4 align-items-center d-flex">
-                                <RadzenLabel Text="Solution Repo" />
+                                <RadzenLabel Text="Solution Repo"/>
                             </div>
                             <div class="col-md-8">
-                                <RadzenTextBox style="width: 100%;" Name="SolutionRepository" @bind-Value=dockerConfig.SolutionRepository Disabled=isupdate MouseEnter="@(args => ShowTooltipSolutionRepo(args) )" />
+                                <RadzenTextBox style="width: 100%;" Name="SolutionRepository" @bind-Value=dockerConfig.SolutionRepository Disabled=isupdate MouseEnter="@(args => ShowTooltipSolutionRepo(args))"/>
                             </div>
                         </div>
                         <br>
                         <div class="row">
                             <div class="col-md-4 align-items-center d-flex">
-                                <RadzenLabel Text="Repo Branch" />
+                                <RadzenLabel Text="Repo Branch"/>
                             </div>
                             <div class="col-md-8">
-                                <RadzenTextBox style="width: 100%;" Name="RepositoryBranch" @bind-Value=dockerConfig.Branch Disabled=isupdate MouseEnter="@(args => ShowTooltipRepoBranch(args) )" />
+                                <RadzenTextBox style="width: 100%;" Name="RepositoryBranch" @bind-Value=dockerConfig.Branch Disabled=isupdate MouseEnter="@(args => ShowTooltipRepoBranch(args))"/>
                             </div>
                         </div>
                         <br>
                         <div class="row">
                             <div class="col-md-4 align-items-center d-flex">
-                                <RadzenLabel Text="Restore Build Prj" />
+                                <RadzenLabel Text="Restore Build Prj"/>
                             </div>
                             <div class="col-md-8">
-                                <RadzenTextBox style="width: 100%;" Name="RestoreBuildProject" @bind-Value=dockerConfig.BuildProject Disabled=isupdate MouseEnter="@(args => ShowTooltipRestoreBuildPrj(args) )" />
+                                <RadzenTextBox style="width: 100%;" Name="RestoreBuildProject" @bind-Value=dockerConfig.BuildProject Disabled=isupdate MouseEnter="@(args => ShowTooltipRestoreBuildPrj(args))"/>
                             </div>
                         </div>
                         <br>
@@ -93,13 +95,13 @@
                             <div class="col-md-4 align-items-left d-flex">
                                 <RadzenRadioButtonList @bind-Value=@_appEntryName Change=@AppNameChange TValue="int" Disabled=isupdate>
                                     <Items>
-                                        <RadzenRadioButtonListItem Text="App Name" Value="1" />
-                                        <RadzenRadioButtonListItem Text="Wasm Prj" Value="2" />
+                                        <RadzenRadioButtonListItem Text="App Name" Value="1"/>
+                                        <RadzenRadioButtonListItem Text="Wasm Prj" Value="2"/>
                                     </Items>
                                 </RadzenRadioButtonList>
                             </div>
                             <div class="col-md-8">
-                                <RadzenTextBox style="width: 100%;" Name="AppEntry" @bind-Value=dockerConfig.AppEntryName Disabled=isupdate />
+                                <RadzenTextBox style="width: 100%;" Name="AppEntry" @bind-Value=dockerConfig.AppEntryName Disabled=isupdate/>
                             </div>
 
                         </div>
@@ -107,28 +109,28 @@
                         <br>
                         <div class="row">
                             <div class="col-md-4 align-items-center d-flex">
-                                <RadzenLabel Text="SDK Version" />
+                                <RadzenLabel Text="SDK Version"/>
                             </div>
                             <div class="col-md-8">
-                                <RadzenTextBox style="width: 100%;" Name="SDKVersion" @bind-Value=dockerConfig.SkdVersion Disabled=isupdate MouseEnter="@(args => ShowTooltipSDKVersion(args) )" />
+                                <RadzenTextBox style="width: 100%;" Name="SDKVersion" @bind-Value=dockerConfig.SkdVersion Disabled=isupdate MouseEnter="@(args => ShowTooltipSDKVersion(args))"/>
                             </div>
                         </div>
                         <br>
                         <div class="row">
                             <div class="col-md-4 align-items-center d-flex">
-                                <RadzenLabel Text="Solution Folder" />
+                                <RadzenLabel Text="Solution Folder"/>
                             </div>
                             <div class="col-md-8">
-                                <RadzenTextBox style="width: 100%;" Name="SolutionFolder" @bind-Value=dockerConfig.SolutionFolder Disabled=isupdate />
+                                <RadzenTextBox style="width: 100%;" Name="SolutionFolder" @bind-Value=dockerConfig.SolutionFolder Disabled=isupdate/>
                             </div>
                         </div>
                         <br>
                         <div class="row">
                             <div class="col-md-4 align-items-center d-flex">
-                                <RadzenLabel Text="Image Version" />
+                                <RadzenLabel Text="Image Version"/>
                             </div>
                             <div class="col-md-8">
-                                <RadzenTextBox style="width: 100%;" Name="ImageVersion" @bind-Value=dockerConfig.ImageVersion Disabled=isupdate />
+                                <RadzenTextBox style="width: 100%;" Name="ImageVersion" @bind-Value=dockerConfig.ImageVersion Disabled=isupdate/>
                             </div>
                         </div>
                     </RadzenFieldset>
@@ -147,7 +149,8 @@
                             </div>
                         </div>
                         <br>
-                        <div class="row">
+                        @* TODO: ADD NAS SETTING *@
+                        @*<div class="row">
                             <div class="col-md-4 align-items-center d-flex">
                                 <RadzenLabel Text="NAS User" />
                             </div>
@@ -173,7 +176,7 @@
                             <div class="col-md-8">
                                 <RadzenTextBox style="width: 100%;" Name="DockerCommand" @bind-Value=dockerConfig.DockerCommand Disabled=isupdate />
                             </div>
-                        </div>
+                        </div>*@
 
                         <br>
                         <div class="row">
@@ -465,7 +468,7 @@ else
                 Note = dockerConfig.Note,
                 Password = dockerConfig.Password,
                 PortAddress = dockerConfig.PortAddress,
-                RestoreProject = dockerConfig.RestoreProject,
+                Icon = dockerConfig.Icon,
                 SkdVersion = dockerConfig.SkdVersion,
                 SolutionFolder = dockerConfig.SolutionFolder,
                 SolutionRepository = dockerConfig.SolutionRepository,

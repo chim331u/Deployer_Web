@@ -5,7 +5,7 @@ namespace Deployer_Web.Data.DTO.DockerDeployer;
 /// </summary>
 public class DockerConfigsDto
 {
-    /// <summary>
+   /// <summary>
     /// Gets or sets the unique identifier for the Docker configuration.
     /// </summary>
     public int Id { get; set; }
@@ -64,7 +64,7 @@ public class DockerConfigsDto
     /// Gets or sets the port address for the Docker configuration.
     /// </summary>
     public string PortAddress { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the NAS local folder path.
     /// </summary>
@@ -113,7 +113,7 @@ public class DockerConfigsDto
     /// <summary>
     /// Gets or sets the restore project path.
     /// </summary>
-    public string? RestoreProject { get; set; }
+    public string? Icon { get; set; }
 
     /// <summary>
     /// Gets or sets the build project path.
@@ -124,14 +124,41 @@ public class DockerConfigsDto
     /// Gets or sets the branch name for the repository.
     /// </summary>
     public string? Branch { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the image version for the Docker configuration.
     /// </summary>
     public string? ImageVersion { get; set; }
 
     /// <summary>
+    /// Get or sets if the build should be with no-cache.
+    /// </summary>
+    public bool noCache { get; set; }
+
+    /// <summary>
     /// Gets or sets additional notes for the Docker configuration.
     /// </summary>
     public string? Note { get; set; }
+
+    public int SettingNasId { get; set; }
+    public string? NasAlias { get; set; }
+
+    public string? NasAddress { get; set; } //https://hub.docker.com/
+
+    public string? NasType { get; set; } //DD, Nas, DockerRegistry
+    public string? NasDockerCommandPath { get; set; } //share/.../docker
+    public string? NasDockerFilePath { get; set; } // /root/Dockerfile
+    public string? NasUser { get; set; }
+    public string? NasPassword { get; set; }
+
+    public int SettingRegistryId { get; set; }
+    public string? RegistryAlias { get; set; }
+
+    public string? RegistryAddress { get; set; } //https://hub.docker.com/
+
+    public string? RegistryType { get; set; } //DockerRegistry
+
+    public string? RegistryUser { get; set; }
+    
+    public string? RegistryPassword { get; set; }
 }
