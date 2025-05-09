@@ -12,6 +12,8 @@ namespace Deployer_Web.Interfaces
         Task<DockerConfigsDto> AddConfig(DockerConfigsDto dockerConfig);
         Task<bool> DeleteConfig(int dockerConfigId);
         Task<List<DeployDetailDto>> GetDeployDetailList(string dockerConfigId);
+        Task<List<SettingListDto>> GetSettingsList();
+        
         Task<DeployResult> GetDeployDetail(int deployDetatilId);
         Task<string> RunDeploy(int dockerConfigId);
         Task<string> GetDockerFile(DockerConfigsDto dockerConfig);

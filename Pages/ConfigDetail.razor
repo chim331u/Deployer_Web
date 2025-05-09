@@ -1,5 +1,6 @@
 ﻿@using System.Data.SqlTypes
 @using Deployer_Web.Data.DTO.DockerDeployer
+@using Deployer_Web.Data.Enum
 @inject NotificationService NotificationService
 @inject TooltipService tooltipService
 @inject DialogService DialogService
@@ -20,14 +21,13 @@
                                 <RadzenLabel Text="Docker Name"/>
                             </div>
                             <div class="col-md-8">
-                                <RadzenTextBox style="width: 100%;" Name="DockerName" @bind-Value=dockerConfig.Name
-                                               Disabled=isupdate />
+                                <RadzenTextBox style="width: 100%;" Name="DockerName" Disabled=isupdate @bind-Value=dockerConfig.Name />
                             </div>
                         </div>
                         <br>
                         <div class="row">
                             <div class="col-md-4 align-items-center d-flex">
-                                <RadzenLabel Text="Description" />
+                                <RadzenLabel Text="Description"/>
                             </div>
                             <div class="col-md-8">
                                 <RadzenTextBox style="width: 100%;" Name="Description"
@@ -47,7 +47,7 @@
                         <br>
                         <div class="row">
                             <div class="col-md-4 align-items-center d-flex">
-                                <RadzenLabel Text="Icon" />
+                                <RadzenLabel Text="Icon"/>
                             </div>
                             <div class="col-md-8">
                                 <RadzenTextBox style="width: 100%;" Name="Icon" @bind-Value=dockerConfig.Icon
@@ -57,7 +57,7 @@
                     </RadzenFieldset>
 
                     <RadzenFieldset Text="App Info">
-                        @* TODO: ADD DOCKER REGISTRY *@
+                        
                         @* TODO: ADD Compile with nocache *@
                         <div class="row">
                             <div class="col-md-4 align-items-center d-flex">
@@ -99,6 +99,16 @@
                                 <RadzenTextBox style="width: 100%;" Name="RestoreBuildProject"
                                                @bind-Value=dockerConfig.BuildProject Disabled=isupdate
                                                MouseEnter="@(args => ShowTooltipRestoreBuildPrj(args))"/>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4 align-items-center d-flex">
+                                <RadzenLabel Text="Build without cache"/>
+                            </div>
+                            <div class="col-md-8">
+                                <RadzenSwitch style="width: 100%;" Name="noCache" @bind-Value=dockerConfig.noCache
+                                               Disabled=isupdate />
                             </div>
                         </div>
                         <br>
@@ -158,54 +168,29 @@
 
 
                     <RadzenFieldset Text="NAS Info">
-                        @* TODO: ADD NAS SETTING *@
+                        
                         <div class="row">
                             <div class="col-md-4 align-items-center d-flex">
                                 <RadzenLabel Text="NAS Alias"/>
                             </div>
                             <div class="col-md-8">
-                                <RadzenTextBox style="width: 100%;" Name="NasAlias" @bind-Value=dockerConfig.NasAlias
-                                               Disabled=isupdate />
+                                @if (isupdate)
+                                {
+                                    <RadzenTextBox style="width: 100%;" Name="NasAlias" 
+                                                   @bind-Value=dockerConfig.NasAlias
+                                                   Disabled=isupdate />
+                                }
+                                else
+                                {
+                                    <RadzenDropDown AllowClear="true" Name="Alias"
+                                                    TValue="SettingListDto" Class="w-99" Placeholder="Select a NAS"
+                                                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                    AllowFiltering="true" TextProperty="Alias"
+                                                    Data=@allSettings @bind-Value="selectedNasSettingDto"/>
+                                }
+                                
                             </div>
                         </div>
-                        @*
-                        <div class="row">
-                            <div class="col-md-4 align-items-center d-flex">
-                                <RadzenLabel Text="NAS Address"/>
-                            </div>
-                            <div class="col-md-8">
-                                <RadzenTextBox style="width: 100%;" Name="NasAddress" @bind-Value=dockerConfig.Host Disabled=isupdate/>
-                            </div>
-                        </div>
-                        <br>
-                        <div class="row">
-                            <div class="col-md-4 align-items-center d-flex">
-                                <RadzenLabel Text="NAS User"/>
-                            </div>
-                            <div class="col-md-8">
-                                <RadzenTextBox style="width: 100%;" Name="NasUser" @bind-Value=dockerConfig.User Disabled=isupdate/>
-                            </div>
-                        </div>
-                        <br>
-                        <div class="row">
-                            <div class="col-md-4 align-items-center d-flex">
-                                <RadzenLabel Text="NAS Password"/>
-                            </div>
-                            <div class="col-md-8">
-                                <RadzenPassword style="width: 100%;" Name="NasPsw" @bind-Value=dockerConfig.Password Disabled=isupdate/>
-                            </div>
-                        </div>
-
-                        <br>
-                        <div class="row">
-                            <div class="col-md-4 align-items-center d-flex">
-                                <RadzenLabel Text="Command"/>
-                            </div>
-                            <div class="col-md-8">
-                                <RadzenTextBox style="width: 100%;" Name="DockerCommand" @bind-Value=dockerConfig.DockerCommand Disabled=isupdate/>
-                            </div>
-                        </div>*@
-
                         <br>
                         <div class="row">
                             <div class="col-md-4 align-items-center d-flex">
@@ -219,7 +204,7 @@
                     </RadzenFieldset>
 
                     <RadzenFieldset Text="Docker Registry">
-                        @* TODO: ADD NAS SETTING *@
+                        
                         <div class="row">
                             <div class="col-md-4 align-items-center d-flex">
                                 <RadzenLabel Text="Registry Alias"/>
@@ -227,13 +212,17 @@
                             <div class="col-md-8">
                                 @if (isupdate)
                                 {
-                                    <RadzenTextBox style="width: 100%;" Name="RegistryAlias" @bind-Value=dockerConfig.RegistryAlias
-                                                   Disabled /> 
+                                    <RadzenTextBox style="width: 100%;" Name="RegistryAlias"
+                                                   @bind-Value=dockerConfig.RegistryAlias
+                                                   Disabled=isupdate />
                                 }
                                 else
                                 {
-                                    <RadzenTextBox style="width: 100%;" Name="RegistryAlias" @bind-Value=dockerConfig.RegistryAlias
-                                                   Disabled=isupdate />
+                                    <RadzenDropDown AllowClear="true" Name="Alias"
+                                                    TValue="SettingListDto" Class="w-99" Placeholder="Select a Registry"
+                                                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                                    AllowFiltering="true" TextProperty="Alias"
+                                                    Data=@allSettings @bind-Value="selectedRegistrySettingDto"/>
                                 }
                             </div>
                         </div>
@@ -248,7 +237,7 @@
                             </div>
                         </div>
                     </RadzenFieldset>
-                    
+
                     <RadzenFieldset Text="Container Info">
                         <div class="row">
                             <div class="col-md-4 align-items-center d-flex">
@@ -375,6 +364,15 @@ else
     [Parameter] public EventCallback<int> IdChanged { get; set; }
 
     private DockerConfigsDto? dockerConfig;
+
+    // private IEnumerable<SettingType> settingTypes;
+    // private SettingType settingType;
+    private IList<SettingListDto> allSettings;
+    private IList<SettingListDto> listOfSettingRegistry;
+    private IList<SettingListDto> listOfSettingNas;
+    private SettingListDto selectedRegistrySettingDto;
+    private SettingListDto selectedNasSettingDto;
+
     private bool isupdate = true;
     private int _appEntryName = 1;
 
@@ -402,6 +400,32 @@ else
             dockerConfig.Name = string.Empty;
             isupdate = false;
         }
+
+        allSettings = await _controller.GetSettingsList();
+
+        // listOfSettingRegistry = allSettings.Where(x => x.Type == SettingType.DOCKERREGISTRY).ToList();
+        // listOfSettingNas = allSettings.Where(x => x.Type == SettingType.NAS).ToList();
+
+        // listOfSettingRegistry = new List<SettingListDto>();
+        // listOfSettingRegistry.Add(new SettingListDto()
+        // {
+        //     Alias = "Nas1", Id = 1, Type = SettingType.NAS
+        // });
+        // listOfSettingRegistry.Add(new SettingListDto()
+        // {
+        //     Alias = "Nas2", Id = 2, Type = SettingType.NAS
+        // });
+        // listOfSettingRegistry.Add(new SettingListDto()
+        // {
+        //     Alias = "Registry1", Id = 3, Type = SettingType.DOCKERREGISTRY
+        // });
+        // listOfSettingRegistry.Add(new SettingListDto()
+        // {
+        //     Alias = "Registry2", Id = 4, Type = SettingType.DOCKERREGISTRY
+        // });
+
+
+        //settingTypes = Enum.GetValues(typeof(SettingType)).Cast<SettingType>();
     }
 
     void OnChange(object value, string name)
@@ -422,6 +446,10 @@ else
                 arg.AppEntryName = "WASM";
             }
 
+            arg.SettingRegistryId = selectedRegistrySettingDto is { Id: > 0 } ? selectedRegistrySettingDto.Id : 0;
+
+            arg.SettingNasId = selectedNasSettingDto is { Id: > 0 } ? selectedNasSettingDto.Id : 0;
+            
             dockerConfig = await _controller.AddConfig(arg);
 
             if (dockerConfig == null)
@@ -459,6 +487,10 @@ else
             {
                 arg.AppEntryName = "WASM";
             }
+
+            arg.SettingRegistryId = selectedRegistrySettingDto is { Id: > 0 } ? selectedRegistrySettingDto.Id : 0;
+
+            arg.SettingNasId = selectedNasSettingDto is { Id: > 0 } ? selectedNasSettingDto.Id : 0;
 
             dockerConfig = await _controller.UpdateConfig(arg);
 

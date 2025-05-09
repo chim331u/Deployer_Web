@@ -283,6 +283,35 @@ namespace Deployer_Web.Service
 
         }
 
+                public async Task<List<SettingListDto>> GetSettingsList()
+                {
+        
+                    Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/GetSettingList", string.Empty));
+        
+                        var dataResponse = new List<SettingListDto>();
+        
+                    try
+                    {
+                        HttpResponseMessage response = await _httpClient.GetAsync(uri);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string content = await response.Content.ReadAsStringAsync();
+                            dataResponse = JsonSerializer.Deserialize<List<SettingListDto>>(content, _serializerOptions);
+                        }
+        
+                        return dataResponse;
+        
+                    }
+                    catch (Exception ex)
+                    {
+        
+                        Console.WriteLine(@"\tERROR {0}", ex.Message);
+        
+                        return null;
+                    }
+        
+        
+                }
        
         #region Service
 
