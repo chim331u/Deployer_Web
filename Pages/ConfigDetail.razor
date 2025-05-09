@@ -49,9 +49,12 @@
                             <div class="col-md-4 align-items-center d-flex">
                                 <RadzenLabel Text="Icon"/>
                             </div>
-                            <div class="col-md-8">
+                            <div class="col-md-5">
                                 <RadzenTextBox style="width: 100%;" Name="Icon" @bind-Value=dockerConfig.Icon
                                                Disabled=isupdate />
+                            </div>
+                            <div class="col-md-3">
+                                <RadzenIcon Icon=@dockerConfig.Icon />
                             </div>
                         </div>
                     </RadzenFieldset>
@@ -106,8 +109,9 @@
                             <div class="col-md-4 align-items-center d-flex">
                                 <RadzenLabel Text="Build without cache"/>
                             </div>
-                            <div class="col-md-8">
-                                <RadzenSwitch style="width: 100%;" Name="noCache" @bind-Value=dockerConfig.noCache
+                            <div class="col-md-2">
+                                <RadzenSwitch Name="noCache" 
+                                              @bind-Value=dockerConfig.noCache
                                                Disabled=isupdate />
                             </div>
                         </div>
