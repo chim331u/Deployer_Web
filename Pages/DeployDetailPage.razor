@@ -1,4 +1,5 @@
-﻿@inject NotificationService NotificationService
+﻿@using Deployer_Web.Data.DTO.DockerDeployer
+@inject NotificationService NotificationService
 
 
 <h2 class="rz-color-secondary">@Name (Id: @Id)</h2>
@@ -37,9 +38,9 @@
                     <RadzenColumn Size="12" SizeMD="2" Gap="1rem">
                         <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" Gap="1rem" Wrap="FlexWrap.Wrap">
                             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Docker Commands</RadzenText>
-                            <RadzenButton ButtonStyle="ButtonStyle.Info" Click=@(args => command="/share/CACHEDEV2_DATA/.qpkg/container-station/bin/docker images") Icon="keyboard_command_key" Text="Images"></RadzenButton>
-                            <RadzenButton ButtonStyle="ButtonStyle.Info" Click=@(args => command="/share/CACHEDEV2_DATA/.qpkg/container-station/bin/docker container ls ") Icon="keyboard_command_key" Text="Container"></RadzenButton>
-                            <RadzenButton ButtonStyle="ButtonStyle.Info" Click=@(args => command="/share/CACHEDEV2_DATA/.qpkg/container-station/bin/docker images") Icon="keyboard_command_key" Text="Other"></RadzenButton>
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Click=@(args => command="docker images") Icon="keyboard_command_key" Text="Images"></RadzenButton>
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Click=@(args => command="docker container ls ") Icon="keyboard_command_key" Text="Container"></RadzenButton>
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Click=@(args => command="docker images") Icon="keyboard_command_key" Text="Other"></RadzenButton>
                         </RadzenStack>
 
                     </RadzenColumn>
@@ -88,7 +89,7 @@
     // bool dockerCommand = false;
     bool busy;
     bool _timer = false;
-    DeployResult deployDetail;
+    DeployDetailDto deployDetail;
 
     private HubConnection? _hubConnection;
 
@@ -208,14 +209,14 @@
 
     private async Task SendCommand()
     {
-        // ConsoleResultText += $"> {command} {Environment.NewLine}";
-        //
-        // var result = await _service.SendCommand(Id, command);
-        // // var result = $"{command} send : response";
-        //
-        // ConsoleResultText += result + Environment.NewLine;
-        //
-        // command = string.Empty;
+        ConsoleResultText += $"> {command} {Environment.NewLine}";
+        
+        var result = await _service.SendCommand(Id, command);
+        // var result = $"{command} send : response";
+        
+        ConsoleResultText += result + Environment.NewLine;
+        
+        command = string.Empty;
 
 
     }

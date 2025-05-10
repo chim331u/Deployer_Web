@@ -14,12 +14,12 @@ namespace Deployer_Web.Interfaces
         Task<List<DeployDetailDto>> GetDeployDetailList(string dockerConfigId);
         Task<List<SettingListDto>> GetSettingsList();
         
-        Task<DeployResult> GetDeployDetail(int deployDetatilId);
+        Task<DeployDetailDto> GetDeployDetail(int deployDetailId);
         Task<string> RunDeploy(int dockerConfigId);
         Task<string> GetDockerFile(DockerConfigsDto dockerConfig);
 
-        Task<DeployResult> UpdateDeployDetail(int id, string result);
-        Task<string> SendCommand(int id, string command);
+        Task<DeployDetailDto> UpdateDeployDetail(int id, string result);
+        Task<DockerCommandResponse<string>> SendCommand(int id, string command);
         
 
 

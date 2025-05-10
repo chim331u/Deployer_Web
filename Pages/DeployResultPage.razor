@@ -1,4 +1,5 @@
-﻿@inject NotificationService NotificationService
+﻿@using Deployer_Web.Data.DTO.DockerDeployer
+@inject NotificationService NotificationService
 @*<h3>DeployResultPage</h3>*@
 <RadzenNotification></RadzenNotification>
 
@@ -49,7 +50,7 @@ else
     [Parameter] public string DockerName { get; set; }
     [Parameter] public EventCallback OnClickDetail { get; set; }
 
-    DeployResult deployDetail;
+    DeployDetailDto deployDetail;
     string logFromFile = "";
     string dockerName = "";
 

@@ -23,8 +23,8 @@ namespace Deployer_Web.Service
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = true,
                 NumberHandling =
-        JsonNumberHandling.AllowReadingFromString |
-        JsonNumberHandling.WriteAsString,
+                    JsonNumberHandling.AllowReadingFromString |
+                    JsonNumberHandling.WriteAsString,
                 ReadCommentHandling = JsonCommentHandling.Skip
             };
             _config = config;
@@ -32,7 +32,6 @@ namespace Deployer_Web.Service
 
         public async Task<List<DockerConfigListDto>> GetActiveDockerConfigList()
         {
-
             Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/GetDockerConfigList", string.Empty));
 
 
@@ -48,17 +47,13 @@ namespace Deployer_Web.Service
                 }
 
                 return dataResponse;
-
             }
             catch (Exception ex)
             {
-
                 Console.WriteLine(@"\tERROR {0}", ex.Message);
 
                 return null;
             }
-
-
         }
 
         public async Task<DockerConfigsDto?> GetDockerConfig(int id)
@@ -79,17 +74,16 @@ namespace Deployer_Web.Service
             }
             catch (Exception ex)
             {
-
                 Console.WriteLine(@"\tERROR {0}", ex.Message);
 
                 return null;
             }
-
         }
 
         public async Task<DockerConfigsDto> UpdateConfig(DockerConfigsDto dockerConfig)
         {
-            Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/UpdateDockerConfig/{dockerConfig.Id}", string.Empty));
+            Uri uri = new Uri(
+                string.Format(GetRestUrl() + $"api/v1/UpdateDockerConfig/{dockerConfig.Id}", string.Empty));
 
             try
             {
@@ -103,7 +97,6 @@ namespace Deployer_Web.Service
                 }
 
                 return null;
-
             }
             catch (Exception ex)
             {
@@ -111,8 +104,6 @@ namespace Deployer_Web.Service
 
                 return null;
             }
-
-
         }
 
         public async Task<bool> DeleteConfig(int dockerId)
@@ -131,7 +122,6 @@ namespace Deployer_Web.Service
                 }
 
                 return false;
-
             }
             catch (Exception ex)
             {
@@ -139,8 +129,6 @@ namespace Deployer_Web.Service
 
                 return false;
             }
-
-
         }
 
         public async Task<DockerConfigsDto> AddConfig(DockerConfigsDto dockerConfig)
@@ -173,7 +161,8 @@ namespace Deployer_Web.Service
 
         public async Task<List<DeployDetailDto>> GetDeployDetailList(string dockerConfigId)
         {
-            Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/GetDeployDetailList/{dockerConfigId}", string.Empty));
+            Uri uri = new Uri(
+                string.Format(GetRestUrl() + $"api/v1/GetDeployDetailList/{dockerConfigId}", string.Empty));
 
 
             var dataResponse = new List<DeployDetailDto>();
@@ -200,12 +189,13 @@ namespace Deployer_Web.Service
             }
         }
 
-        public async Task<DeployResult> GetDeployDetail(int deployDetatilId)
+        public async Task<DeployDetailDto> GetDeployDetail(int deployDetatilId)
         {
-            Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/GetDeployDetailResult/{deployDetatilId}", string.Empty));
+            Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/GetDeployDetailResult/{deployDetatilId}",
+                string.Empty));
 
 
-            DeployResult dataResponse;
+            DeployDetailDto dataResponse;
 
             try
             {
@@ -213,15 +203,13 @@ namespace Deployer_Web.Service
                 if (response.IsSuccessStatusCode)
                 {
                     string content = await response.Content.ReadAsStringAsync();
-                    return dataResponse = JsonSerializer.Deserialize<DeployResult>(content, _serializerOptions);
+                    return dataResponse = JsonSerializer.Deserialize<DeployDetailDto>(content, _serializerOptions);
                 }
 
                 return null;
-
             }
             catch (Exception ex)
             {
-
                 Console.WriteLine(@"\tERROR {0}", ex.Message);
 
                 return null;
@@ -243,11 +231,9 @@ namespace Deployer_Web.Service
                 }
 
                 return "Error";
-
             }
             catch (Exception ex)
             {
-
                 Console.WriteLine(@"\tERROR {0}", ex.Message);
 
                 return ex.Message;
@@ -256,7 +242,7 @@ namespace Deployer_Web.Service
 
         public async Task<string> RunDeploy(int dockerConfigId)
         {
-            Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/RunDeploy/{dockerConfigId}", string.Empty));
+            Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/ExecuteFullDeploy/{dockerConfigId}", string.Empty));
 
             string _dataResponse;
             try
@@ -267,64 +253,47 @@ namespace Deployer_Web.Service
                 {
                     string content = await response.Content.ReadAsStringAsync();
                     return content;
-
                 }
 
                 return $"Error: {response.Content.Headers}";
             }
             catch (Exception ex)
             {
-
                 Console.WriteLine(@"\tERROR {0}", ex.Message);
 
                 return $"Error: {ex.Message}";
             }
-
-
         }
 
-                public async Task<List<SettingListDto>> GetSettingsList()
+        public async Task<List<SettingListDto>> GetSettingsList()
+        {
+            Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/GetSettingList", string.Empty));
+
+            var dataResponse = new List<SettingListDto>();
+
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync(uri);
+                if (response.IsSuccessStatusCode)
                 {
-        
-                    Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/GetSettingList", string.Empty));
-        
-                        var dataResponse = new List<SettingListDto>();
-        
-                    try
-                    {
-                        HttpResponseMessage response = await _httpClient.GetAsync(uri);
-                        if (response.IsSuccessStatusCode)
-                        {
-                            string content = await response.Content.ReadAsStringAsync();
-                            dataResponse = JsonSerializer.Deserialize<List<SettingListDto>>(content, _serializerOptions);
-                        }
-        
-                        return dataResponse;
-        
-                    }
-                    catch (Exception ex)
-                    {
-        
-                        Console.WriteLine(@"\tERROR {0}", ex.Message);
-        
-                        return null;
-                    }
-        
-        
+                    string content = await response.Content.ReadAsStringAsync();
+                    dataResponse = JsonSerializer.Deserialize<List<SettingListDto>>(content, _serializerOptions);
                 }
-       
-        #region Service
 
+                return dataResponse;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(@"\tERROR {0}", ex.Message);
 
-        public string GetRestUrl()
-        {
-            var uri = _config.GetSection("Uri").Value;
-            return uri;
+                return null;
+            }
         }
 
-        public async Task<DeployResult> UpdateDeployDetail(int id, string result)
+        public async Task<DeployDetailDto> UpdateDeployDetail(int id, string result)
         {
-            Uri uri = new Uri(string.Format(GetRestUrl() + $"Api/DockerConfig/UpdateDeployDetailResult/{id}/{result}", string.Empty));
+            Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/UpdateDeployDetailResult/{id}/{result}",
+                string.Empty));
 
             try
             {
@@ -333,12 +302,11 @@ namespace Deployer_Web.Service
                 if (response.IsSuccessStatusCode)
                 {
                     string content = await response.Content.ReadAsStringAsync();
-                    var dataResponse = JsonSerializer.Deserialize<DeployResult>(content, _serializerOptions);
+                    var dataResponse = JsonSerializer.Deserialize<DeployDetailDto>(content, _serializerOptions);
                     return dataResponse;
                 }
 
                 return null;
-
             }
             catch (Exception ex)
             {
@@ -348,35 +316,34 @@ namespace Deployer_Web.Service
             }
         }
 
-        public async Task<string> SendCommand(int id, string command)
+        #region Service
+
+        public string GetRestUrl()
         {
-            //Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/DockerDeployer/SendCommand/{id}/{command}", string.Empty));
-            // Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/DockerDeployer/SendCommand", string.Empty));
-            //
-            // try
-            // {
-            //     var param = new CommandDto
-            //     {
-            //         Id = id,
-            //         Command = command
-            //     };
-            //
-            //
-            //     //HttpResponseMessage response = await _httpClient.GetAsync(uri);
-            //     HttpResponseMessage response = await _httpClient.PostAsJsonAsync(uri, param);
-            //     if (response.IsSuccessStatusCode)
-            //     {
-            //         string content = response.Content.ReadAsStringAsync().Result;
-            //         return content;
-            //     }
-            //     return $"Error: {response.ReasonPhrase}";
-            // }
-            // catch (Exception ex)
-            // {
-            //     Console.WriteLine(@"\tERROR {0}", ex.Message);
-            //     return $"Error: {ex.Message}";
-            // }
-            return string.Empty;
+            var uri = _config.GetSection("Uri").Value;
+            return uri;
+        }
+
+        public async Task<DockerCommandResponse<string>> SendCommand(int id, string command)
+        {
+            try
+            {
+                Uri uri = new Uri(string.Format(GetRestUrl() + $"api/v1/SendSSHCommand/{id}", string.Empty));
+
+                HttpResponseMessage response = await _httpClient.PostAsJsonAsync(uri, JsonSerializer.Serialize(command));
+                if (response.IsSuccessStatusCode)
+                {
+                    string content = await response.Content.ReadAsStringAsync();
+                    var dataResponse = JsonSerializer.Deserialize<DockerCommandResponse<string>>(content, _serializerOptions);
+                    return new DockerCommandResponse<string>(dataResponse.Data, dataResponse.Message, dataResponse.IsSuccess);
+                }
+                return new DockerCommandResponse<string>("Error: " + response.StatusCode, "Send Command", false);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(@"\tERROR {0}", ex.Message);
+                return new DockerCommandResponse<string>("Error: " + ex.Message, "Send Command", false);
+            }
         }
 
         #endregion
